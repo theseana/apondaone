@@ -1,7 +1,6 @@
 from ussd import pages
 
 
-
 def p_0_4():
     p = {
         '0': p_0 ,
@@ -29,13 +28,24 @@ def p_0_2():
     p[input_msg]()
 
 
+def p_1_1():
+    p = {
+            '0': p_0_1 ,
+        }
+    print(pages.page_0_1_1)
+    input_msg = input("replay: ")
+    p[input_msg]()
+
+
 def p_0_1():
     p = {
         '0': p_0 ,
+        '1': p_1_1 ,
     }
     print(pages.page_0_1)
     input_msg = input("replay: ")
     p[input_msg]()
+
 
 def p_0():
     p = {
@@ -48,5 +58,6 @@ def p_0():
     print(pages.page_0)
     input_msg = input("replay: ")
     p[input_msg]()
+
 
 p_0()
