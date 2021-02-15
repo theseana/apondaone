@@ -1,0 +1,16 @@
+[
+    {
+        "username": "sina",
+        "password": "40bd001563085fc35165329ea1ff5c5ecbdbbeef",
+        "created_at": "2021-02-11 12:22:04",
+        "card_number": "sina",
+        "balance": 10000
+    },
+    {
+        "username": "arvand",
+        "password": "40bd001563085fc35165329ea1ff5c5ecbdbbeef",
+        "created_at": "2021-02-11 12:22:13",
+        "card_number": "arvand",
+        "balance": 10000
+    }
+]
