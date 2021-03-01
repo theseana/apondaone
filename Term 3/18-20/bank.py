@@ -55,9 +55,10 @@ def confirm():
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$ Login Button $$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 def log_in():
-    global person
+    global person, ind
     names = read_json('names.json')
     for name in names:
+        
         if name['username'] == username_l.get():
             if name['password'] == sha(password_l.get()):
                 root.withdraw()
@@ -65,18 +66,22 @@ def log_in():
                 person = name
                 messagebox.showinfo(title='Success!',message='You Loged-in Successfully!')
                 return None
+        ind += 1
     messagebox.showinfo(title='Failed!',message='Username or Password is invalid!') 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Withdraw $$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 def withdraw():
     def withdrawal():
-        global person
+        global person, ind
         amount = withdraw_amount.get()
-        persons = read_json('names.json')
-        for p in persons:
-            if p["username"] == person["username"]:
-                if p["balance"] > amount:
+        if person["balance"] > amount:
+            names = read_json('names.json')
+            names[ind]["balance"] -= amount
+            write_json('names.json', names)
+            messagebox.showinfo(title='Successfully Done',message='Withdraw successfull!')             
+        else:
+            messagebox.showerror(title='Failed!',message='Not Enough MOney!') 
     top = tk.Toplevel()
     withdraw_amount = tk.IntVar()
     tk.Entry(top, cnf=conf, textvariable=withdraw_amount).grid(row=0, column=0)
@@ -109,6 +114,7 @@ conf = {
     'font': ('times', 25)
 }
 person = None
+ind = 0
 menu = tk.Toplevel()
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$ Notebook $$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
