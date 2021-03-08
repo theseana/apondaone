@@ -5,6 +5,7 @@ import hashlib
 import datetime
 import random
 from tkinter import messagebox
+from tkinter.font import names
 
 
 def now():
@@ -88,6 +89,7 @@ def withdraw():
             names[ind]["balance"] -= amount
             write_json('names.json', names)
             messagebox.showinfo(title='Successfully Done',message='Withdraw successfull!')             
+            top.withdraw()
         else:
             messagebox.showerror(title='Failed!',message='Not Enough MOney!') 
     top = tk.Toplevel()
@@ -109,7 +111,10 @@ def transfer():
                 names[get_destination(des.get())]["balance"] += amount
                 write_json('names.json', names)
                 messagebox.showinfo(title='Successfully Done',message='Transfer successfull!')             
+                top.destroy()
+                menu.deiconify()
             else:
+
                 messagebox.showerror(title='Failed!',message='Not Destination Found!') 
         else:            
             messagebox.showerror(title='Failed!',message='Not Enough MOney!') 
@@ -152,11 +157,39 @@ def balance():
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$ Change Pass $$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 def change_pass():
-    pass
+    def change():
+        global person, ind
+        if person["password"] == sha(old.get()):
+            if sha(new.get()) == sha(new2.get()):
+                names = read_json('names.json')
+                names[ind]["password"] = sha(new.get())
+                write_json('names.json', names)
+                messagebox.showinfo(title='Successfully Done',message='Password Changed!')             
+            else:
+                messagebox.showerror(title='Failed!',message='Not Matched!') 
+        else:            
+            messagebox.showerror(title='Failed!',message='Wrong Password!') 
+ 
+    top = tk.Toplevel()
+    tk.Label(top, text="Old Password: ").grid(row=0, column=0)
+    old = tk.StringVar()
+    tk.Entry(top, cnf=conf, textvariable=old).grid(row=0, column=1)
+
+    tk.Label(top, text="New Password: ").grid(row=1, column=0)
+    new = tk.StringVar()
+    tk.Entry(top, cnf=conf, textvariable=new).grid(row=1, column=1)
+
+    tk.Label(top, text="New Password2: ").grid(row=2, column=0)
+    new2 = tk.StringVar()
+    tk.Entry(top, cnf=conf, textvariable=new2).grid(row=2, column=1)
+    tk.Button(top, text='Change', cnf=conf, command=change).grid(row=3, column=0)
+
 
 root = tk.Tk()
 conf = {
-    'font': ('times', 25)
+    'font': ('times', 25),
+    'bg': '#000000',
+    'fg': '#ffffff'
 }
 person = None
 ind = 0
@@ -173,33 +206,33 @@ login = tk.Frame(note)
 note.add(register, text='Register')
 note.add(login, text='Log-in')
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$ Register $$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
-tk.Label(register, text="Username").grid(row=0, column=0)
+tk.Label(register, text="Username", cnf=conf).grid(row=0, column=0)
 username_r = tk.StringVar()
-tk.Entry(register, textvariable=username_r).grid(row=0, column=1)
+tk.Entry(register, textvariable=username_r, cnf=conf).grid(row=0, column=1)
 
-tk.Label(register, text="Password").grid(row=1, column=0)
+tk.Label(register, text="Password", cnf=conf).grid(row=1, column=0)
 password_r = tk.StringVar()
-tk.Entry(register, textvariable=password_r, show="*").grid(row=1, column=1)
+tk.Entry(register, textvariable=password_r, show="*", cnf=conf).grid(row=1, column=1)
 
-button_register = tk.Button(register, text='Register', command=confirm)
+button_register = tk.Button(register, text='Register', command=confirm, cnf=conf)
 button_register.grid(row=2, column=0, columnspan=2, sticky=tk.W+tk.E)
 button_register.bind("<Return>", confirm)
 
-tk.Button(register, text='Cancel', command=root.destroy).grid(row=3, column=0, columnspan=2, sticky=tk.W+tk.E)
+tk.Button(register, text='Cancel', command=root.destroy, cnf=conf).grid(row=3, column=0, columnspan=2, sticky=tk.W+tk.E)
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Login $$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
-tk.Label(login, text="Username").grid(row=0, column=0)
+tk.Label(login, text="Username", cnf=conf).grid(row=0, column=0)
 username_l = tk.StringVar()
-tk.Entry(login, textvariable=username_l).grid(row=0, column=1)
+tk.Entry(login, textvariable=username_l, cnf=conf).grid(row=0, column=1)
 
-tk.Label(login, text="Password").grid(row=1, column=0)
+tk.Label(login, text="Password", cnf=conf).grid(row=1, column=0)
 password_l = tk.StringVar()
-tk.Entry(login, textvariable=password_l, show="*").grid(row=1, column=1)
+tk.Entry(login, textvariable=password_l, show="*", cnf=conf).grid(row=1, column=1)
 
-button_log = tk.Button(login, text='Login', command=log_in)
+button_log = tk.Button(login, text='Login', command=log_in, cnf=conf)
 button_log.grid(row=2, column=0, columnspan=2, sticky=tk.W+tk.E)
 button_log.bind("<Return>", log_in)
 
-tk.Button(login, text='Cancel', command=root.destroy).grid(row=3, column=0, columnspan=2, sticky=tk.W+tk.E)
+tk.Button(login, text='Cancel', command=root.destroy, cnf=conf).grid(row=3, column=0, columnspan=2, sticky=tk.W+tk.E)
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Menu $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
