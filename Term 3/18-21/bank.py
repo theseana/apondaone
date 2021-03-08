@@ -34,40 +34,48 @@ def new_card_number():
     else:
         return random.randint(6000000000000000, 7000000000000000)
 
+def get_destination(card):
+    names = read_json('names.json')
+    for name in names:
+        if str(name["card_number"]) == card:
+            return names.index(name)
+    return None
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$ Register Button $$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
-def confirm():
-    info = {}
-    info['username'] = username_r.get()
-    info['password'] = sha(password_r.get())
-    info['created_at'] = now()
-    info['card_number'] = new_card_number()
-    info['balance'] = 10000
-    names_json = read_json('names.json')
-    names_json.append(info)
-    write_json('names.json', names_json)
-    messagebox.showinfo(title='Success!',message='You registed successfully!')
-    username_r.set('')
-    password_r.set('')
+def confirm(a=None):
+    if note.tab(note.select(), "text") == "Register":
+        info = {}
+        info['username'] = username_r.get()
+        info['password'] = sha(password_r.get())
+        info['created_at'] = now()
+        info['card_number'] = new_card_number()
+        info['balance'] = 10000
+        names_json = read_json('names.json')
+        names_json.append(info)
+        write_json('names.json', names_json)
+        messagebox.showinfo(title='Success!',message='You registed successfully!')
+        username_r.set('')
+        password_r.set('')
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$ Login Button $$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
-def log_in():
-    global person, ind
-    names = read_json('names.json')
-    for name in names:
-        
-        if name['username'] == username_l.get():
-            if name['password'] == sha(password_l.get()):
-                root.withdraw()
-                menu.deiconify()
-                person = name
-                messagebox.showinfo(title='Success!',message='You Loged-in Successfully!')
-                return None
-        ind += 1
-    messagebox.showinfo(title='Failed!',message='Username or Password is invalid!') 
+def log_in(a=None):
+    if note.tab(note.select(), "text") == "Log-in":
+        global person, ind
+        names = read_json('names.json')
+        for name in names:
+            
+            if name['username'] == username_l.get():
+                if name['password'] == sha(password_l.get()):
+                    root.withdraw()
+                    menu.deiconify()
+                    person = name
+                    messagebox.showinfo(title='Success!',message='You Loged-in Successfully!')
+                    return None
+            ind += 1
+        messagebox.showinfo(title='Failed!',message='Username or Password is invalid!') 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Withdraw $$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
@@ -91,7 +99,44 @@ def withdraw():
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Transfer $$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 def transfer():
-    pass
+    def transfer_money():
+        global person, ind
+        amount = transfer_amount.get()
+        if person["balance"] > amount:
+            if get_destination(des.get()):
+                names = read_json('names.json')
+                names[ind]["balance"] -= amount
+                names[get_destination(des.get())]["balance"] += amount
+                write_json('names.json', names)
+                messagebox.showinfo(title='Successfully Done',message='Transfer successfull!')             
+            else:
+                messagebox.showerror(title='Failed!',message='Not Destination Found!') 
+        else:            
+            messagebox.showerror(title='Failed!',message='Not Enough MOney!') 
+ 
+
+    def validation(var, indx, mode): 
+        c1 = len(des.get()) == 16
+        c2 = des.get().isdigit()
+        if c1 and c2:
+            e1.config(bg="green")
+        else:
+            e1.config(bg="red")
+
+    top = tk.Toplevel()
+    tk.Label(top, text="Amount").grid(row=0, column=0)
+    transfer_amount = tk.IntVar()
+    tk.Entry(top, cnf=conf, textvariable=transfer_amount).grid(row=0, column=1)
+    
+    tk.Label(top, text="Destination").grid(row=1, column=0)
+    des = tk.StringVar()
+    des.trace_add('write', validation)
+
+    e1 = tk.Entry(top, cnf=conf, textvariable=des)
+    e1.grid(row=1, column=1)
+    
+    tk.Button(top, text='Transfer', cnf=conf, command=transfer_money).grid(row=2, column=0)
+    tk.Button(top, text='Close', cnf=conf, command=top.destroy).grid(row=3, column=0)
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Balance $$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
@@ -136,7 +181,10 @@ tk.Label(register, text="Password").grid(row=1, column=0)
 password_r = tk.StringVar()
 tk.Entry(register, textvariable=password_r, show="*").grid(row=1, column=1)
 
-tk.Button(register, text='Register', command=confirm).grid(row=2, column=0, columnspan=2, sticky=tk.W+tk.E)
+button_register = tk.Button(register, text='Register', command=confirm)
+button_register.grid(row=2, column=0, columnspan=2, sticky=tk.W+tk.E)
+button_register.bind("<Return>", confirm)
+
 tk.Button(register, text='Cancel', command=root.destroy).grid(row=3, column=0, columnspan=2, sticky=tk.W+tk.E)
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Login $$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 tk.Label(login, text="Username").grid(row=0, column=0)
@@ -147,7 +195,10 @@ tk.Label(login, text="Password").grid(row=1, column=0)
 password_l = tk.StringVar()
 tk.Entry(login, textvariable=password_l, show="*").grid(row=1, column=1)
 
-tk.Button(login, text='Login', command=log_in).grid(row=2, column=0, columnspan=2, sticky=tk.W+tk.E)
+button_log = tk.Button(login, text='Login', command=log_in)
+button_log.grid(row=2, column=0, columnspan=2, sticky=tk.W+tk.E)
+button_log.bind("<Return>", log_in)
+
 tk.Button(login, text='Cancel', command=root.destroy).grid(row=3, column=0, columnspan=2, sticky=tk.W+tk.E)
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Menu $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ #
